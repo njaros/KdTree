@@ -15,8 +15,23 @@ type KdTree struct {
 	root *kdnode
 }
 
-func NewKdTree() *KdTree {
-	return &KdTree{nil};
+// Usefull for a small amount of points (like thousands)
+// And when the kdtree needs to be implemented often.
+func NewKdTreeUnsorted(pts []Point) *KdTree {
+	kd := KdTree{nil};
+
+	for _, p := range pts {
+		kd.Insert(p);
+	}
+	return &kd;
+}
+
+// Usefull for a big amount of points
+func NewKdTree(pts []Point) *KdTree {
+	kd := KdTree{nil};
+
+	//TODO
+	return &kd;
 }
 
 func (t *KdTree) Insert(p Point) {
@@ -60,16 +75,22 @@ func (n *kdnode) next(p Point) **kdnode {
 	return &n.right;
 }
 
-func (t KdTree) Print() {
-	to_print := "[";
+func (t KdTree) ToString() string {
+	toString := "[";
 	if t.root != nil {
-		t.root.print(&to_print);
+		t.root.toString(&toString);
 	}
-	to_print += "]";
+	toString += "]";
+
+	return toString;
+}
+
+func (t KdTree) Print() {
+	to_print := t.ToString();
 	log.Print(to_print);
 }
 
-func (n *kdnode) print(to_print *string) {
+func (n *kdnode) toString(to_print *string) {
 	*to_print += "(";
 	for axis := range n.point.Dimension() {
 		*to_print += fmt.Sprintf("%.2f", n.point.Axis(axis))
@@ -81,12 +102,12 @@ func (n *kdnode) print(to_print *string) {
 	if (n.left != nil || n.right != nil) {
 		*to_print += " [";
 		if n.left != nil {
-			n.left.print(to_print);
+			n.left.toString(to_print);
 		}
 		*to_print += "] ";
 		*to_print += "[";
 		if n.right != nil {
-			n.right.print(to_print);
+			n.right.toString(to_print);
 		}
 		*to_print += "]";
 	}
