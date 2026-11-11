@@ -3,6 +3,7 @@ package kdtree
 import (
 	"fmt"
 	"log"
+	"github.com/njaros/KdTree/sort"
 )
 
 type Point interface {
@@ -13,12 +14,13 @@ type Point interface {
 
 type KdTree struct {
 	root *kdnode
+	size int
 }
 
 // Usefull for a small amount of points (like thousands)
 // And when the kdtree needs to be implemented often.
 func NewKdTreeUnsorted(pts []Point) *KdTree {
-	kd := KdTree{nil};
+	kd := KdTree{nil, 0};
 
 	for _, p := range pts {
 		kd.Insert(p);
@@ -28,9 +30,11 @@ func NewKdTreeUnsorted(pts []Point) *KdTree {
 
 // Usefull for a big amount of points
 func NewKdTree(pts []Point) *KdTree {
-	kd := KdTree{nil};
+	kd := KdTree{nil, len(pts)};
 
-	//TODO
+	l, m, r := sort.GetMedianPartitions(pts, 0);
+	kd.root = newKdNode(m, 0);
+	kd.root.insertPoints(l, r);
 	return &kd;
 }
 
@@ -42,6 +46,7 @@ func (t *KdTree) Insert(p Point) {
 			t.root.point.Dimension(),
 		);
 	}
+	t.size += 1;
 	depth := 0;
 	current := &t.root;
 	for ;*current != nil; {
@@ -75,6 +80,21 @@ func (n *kdnode) next(p Point) **kdnode {
 	return &n.right;
 }
 
+func (n *kdnode) insertPoints(ptsLeft []Point, ptsRight []Point) {
+	depth := n.depth + 1;
+	axis := depth % n.point.Dimension();
+	if len(ptsLeft) > 0 {
+		l, m, r := sort.GetMedianPartitions(ptsLeft, axis);
+		n.left = newKdNode(m, depth);
+		n.left.insertPoints(l, r);
+	}
+	if len(ptsRight) > 0 {
+		l, m, r := sort.GetMedianPartitions(ptsRight, axis);
+		n.right = newKdNode(m, depth);
+		n.right.insertPoints(l, r);
+	}
+}
+
 func (t KdTree) ToString() string {
 	toString := "[";
 	if t.root != nil {
@@ -88,6 +108,34 @@ func (t KdTree) ToString() string {
 func (t KdTree) Print() {
 	to_print := t.ToString();
 	log.Print(to_print);
+}
+
+func (t KdTree) Nearest(p Point) Point {
+	if t.root == nil {
+		return nil
+	}
+
+	return t.nearest(p, t.root.point, squareDistPoints(p, t.root.point));
+}
+
+func (t KdTree) nearest(p Point, best Point, bestDist float64) Point {
+	//todo
+	return nil;
+}
+
+func squareDistPoints(a Point, b Point) float64 {
+	distance := 0.;
+	for i := range(a.Dimension()) {
+		diff := a.Axis(i) - b.Axis(i);
+		distance += diff * diff;
+	}
+
+	return distance;
+}
+
+func squareDistHyperplan(axis int, val float64, p Point) float64 {
+	d := val - p.Axis(axis);
+	return d * d;
 }
 
 func (n *kdnode) toString(to_print *string) {

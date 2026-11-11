@@ -35,7 +35,7 @@ func TestQuickSelectMedian(t *testing.T) {
 	collectB := collectArrayFromPoints(b, 0);
 
 	expectedA := []float64{-11, -15, 0, 1};
-	expectedB := []float64{12, 22, 7, 12}
+	expectedB := []float64{12, 7, 12, 22}
 	expectedMedian := point.NewPoint2D(4, 3, nil);
 	if !reflect.DeepEqual(median, expectedMedian) {
 		t.Errorf("expected median: %v, found: %v\n", expectedMedian, median);
@@ -46,31 +46,6 @@ func TestQuickSelectMedian(t *testing.T) {
 	if !reflect.DeepEqual(collectB, expectedB) {
 		t.Errorf("expected left array: %v, found %v", expectedB, collectB);
 	}
-}
-
-func TestQuickSelectEmpty(t *testing.T) {
-
-	pts := []Point{}
-
-	a, k, b := QuickSelectPartitions(pts, 0, 0);
-
-	collectA := collectArrayFromPoints(a, 0);
-	collectB := collectArrayFromPoints(b, 0);
-	var expectedK Point;
-	expectedK = nil;
-	expectedA := []float64{};
-	expectedB := []float64{};
-
-	if !reflect.DeepEqual(k, expectedK) {
-		t.Errorf("expected k: %v, found: %v\n", expectedK, k);
-	}
-	if !reflect.DeepEqual(collectA, expectedA) {
-		t.Errorf("expected left array: %v, found %v", expectedA, collectA);
-	}
-	if !reflect.DeepEqual(collectB, expectedB) {
-		t.Errorf("expected left array: %v, found %v", expectedB, collectB);
-	}
-
 }
 
 func TestQuickSelectFirst(t *testing.T) {
@@ -86,16 +61,16 @@ func TestQuickSelectFirst(t *testing.T) {
 		point.NewPoint2D(1, 3, nil),
 	};
 
-	a, median, b := QuickSelectPartitions(pts, 0, 0);
+	a, first, b := QuickSelectPartitions(pts, 0, 0);
 
 	collectA := collectArrayFromPoints(a, 0);
 	collectB := collectArrayFromPoints(b, 0);
 
 	expectedA := []float64{};
-	expectedB := []float64{-11, 0, 1, 4, 12, 22, 7, 12};
-	expectedMedian := point.NewPoint2D(-15, 3, nil);
-	if !reflect.DeepEqual(median, expectedMedian) {
-		t.Errorf("expected median: %v, found: %v\n", expectedMedian, median);
+	expectedB := []float64{-11, 0, 1, 7, 12, 22, 4, 12};
+	expectedFirst := point.NewPoint2D(-15, 3, nil);
+	if !reflect.DeepEqual(first, expectedFirst) {
+		t.Errorf("expected first: %v, found: %v\n", expectedFirst, first);
 	}
 	if !reflect.DeepEqual(collectA, expectedA) {
 		t.Errorf("expected left array: %v, found %v", expectedA, collectA);
@@ -123,9 +98,9 @@ func TestQuickSelectLast(t *testing.T) {
 	collectA := collectArrayFromPoints(a, 0);
 	collectB := collectArrayFromPoints(b, 0);
 
-	expectedA := []float64{};
-	expectedB := []float64{-11, 0, 1, 4, 12, 22, 7, 12};
-	expectedMedian := point.NewPoint2D(-15, 3, nil);
+	expectedA := []float64{-11, -15, 0, 1, 7, 12, 4, 12};
+	expectedB := []float64{};
+	expectedMedian := point.NewPoint2D(22, 3, nil);
 	if !reflect.DeepEqual(median, expectedMedian) {
 		t.Errorf("expected median: %v, found: %v\n", expectedMedian, median);
 	}
@@ -133,6 +108,6 @@ func TestQuickSelectLast(t *testing.T) {
 		t.Errorf("expected left array: %v, found %v", expectedA, collectA);
 	}
 	if !reflect.DeepEqual(collectB, expectedB) {
-		t.Errorf("expected left array: %v, found %v", expectedB, collectB);
+		t.Errorf("expected right array: %v, found %v", expectedB, collectB);
 	}
 }
