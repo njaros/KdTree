@@ -174,9 +174,9 @@ func (t KdTree) GetAllInRange(p Point, r float64) []Point {
 	}
 	rSquared := r * r
 	if squareDistPoints(p, t.root.point) <= rSquared {
-		collect = append(collect, t.root.point);
+		collect = append(collect, t.root.point)
 	}
-	t.root.collectPointsInRange(p, rSquared, &collect);
+	t.root.collectPointsInRange(p, rSquared, &collect)
 	return collect
 }
 

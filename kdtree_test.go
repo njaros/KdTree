@@ -143,7 +143,7 @@ func TestNearestUnsorted(t *testing.T) {
 }
 
 func TestGetRange(t *testing.T) {
-	tree := getKdTreeInstance();
+	tree := getKdTreeInstance()
 	pointTests := []Point{
 		point.NewPoint2D(0, 0, nil),
 		point.NewPoint2D(10, -15, nil),
@@ -207,8 +207,8 @@ func TestGetRange(t *testing.T) {
 			{},
 		},
 	}
-	for i, p := range(pointTests) {
-		for j, r := range(radiusTests) {
+	for i, p := range pointTests {
+		for j, r := range radiusTests {
 			result := tree.GetAllInRange(p, r)
 			if !reflect.DeepEqual(result, expected[i][j]) {
 				t.Errorf("point: %v, range %f, expected %v, found %v", p, r, expected[i][j], result)
