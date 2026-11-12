@@ -111,15 +111,15 @@ func (t KdTree) Print() {
 	log.Print(to_print)
 }
 
-func (t KdTree) Nearest(p Point) *Point {
+func (t KdTree) Nearest(p Point) Point {
 	if t.root == nil {
 		return nil
 	}
 
-	bestDist := squareDistPoints(p, t.root.point);
-	bestPoint := t.root.point;
-	t.root.nearest(p, &bestPoint, &bestDist);
-	return &bestPoint;
+	bestDist := squareDistPoints(p, t.root.point)
+	bestPoint := t.root.point
+	t.root.nearest(p, &bestPoint, &bestDist)
+	return bestPoint
 }
 
 func (n *kdnode) nearest(p Point, best *Point, bestDist *float64) {
@@ -128,53 +128,73 @@ func (n *kdnode) nearest(p Point, best *Point, bestDist *float64) {
 
 	if leftSide {
 		if n.left != nil {
-			nextNodePoint := n.left.point;
-			nextDist := squareDistPoints(p, nextNodePoint);
+			nextNodePoint := n.left.point
+			nextDist := squareDistPoints(p, nextNodePoint)
 			if nextDist < *bestDist {
-				*best = nextNodePoint;
-				*bestDist = nextDist;
+				*best = nextNodePoint
+				*bestDist = nextDist
 			}
 			n.left.nearest(p, best, bestDist)
 		}
 		if n.right != nil && squareDistHyperplan(axis, n.point, p) < *bestDist {
-			nextNodePoint := n.right.point;
-			nextDist := squareDistPoints(p, nextNodePoint);
+			nextNodePoint := n.right.point
+			nextDist := squareDistPoints(p, nextNodePoint)
 			if nextDist < *bestDist {
-				*best = nextNodePoint;
-				*bestDist = nextDist;
+				*best = nextNodePoint
+				*bestDist = nextDist
 			}
 			n.right.nearest(p, best, bestDist)
 		}
 	} else {
 		if n.right != nil {
-			nextNodePoint := n.right.point;
-			nextDist := squareDistPoints(p, nextNodePoint);
+			nextNodePoint := n.right.point
+			nextDist := squareDistPoints(p, nextNodePoint)
 			if nextDist < *bestDist {
-				*best = nextNodePoint;
-				*bestDist = nextDist;
+				*best = nextNodePoint
+				*bestDist = nextDist
 			}
 			n.right.nearest(p, best, bestDist)
 		}
 		if n.left != nil && squareDistHyperplan(axis, n.point, p) < *bestDist {
-			nextNodePoint := n.left.point;
-			nextDist := squareDistPoints(p, nextNodePoint);
+			nextNodePoint := n.left.point
+			nextDist := squareDistPoints(p, nextNodePoint)
 			if nextDist < *bestDist {
-				*best = nextNodePoint;
-				*bestDist = nextDist;
+				*best = nextNodePoint
+				*bestDist = nextDist
 			}
 			n.left.nearest(p, best, bestDist)
 		}
 	}
 }
 
-func (t KdTree) GetAllInRange(p Point, r int) []*Point {
-	//TODO
-	return nil
+func (t KdTree) GetAllInRange(p Point, r float64) []Point {
+	collect := []Point{}
+	if t.root == nil {
+		return collect
+	}
+	rSquared := r * r
+	if squareDistPoints(p, t.root.point) <= rSquared {
+		collect = append(collect, t.root.point);
+	}
+	t.root.collectPointsInRange(p, rSquared, &collect);
+	return collect
 }
 
-func (t KdTree) KNN(p Point, n int) []*Point {
-	//TODO
-	return nil
+func (n *kdnode) collectPointsInRange(p Point, rSquared float64, collected *[]Point) {
+	axis := n.depth % n.point.Dimension()
+	checkOtherSide := squareDistHyperplan(axis, n.point, p) <= rSquared
+	pSide := 0
+	if p.Axis(axis) > n.point.Axis(axis) {
+		pSide = 1
+	}
+	for side, node := range []*kdnode{n.left, n.right} {
+		if node != nil && (side == pSide || checkOtherSide) {
+			if squareDistPoints(node.point, p) <= rSquared {
+				*collected = append(*collected, node.point)
+			}
+			node.collectPointsInRange(p, rSquared, collected)
+		}
+	}
 }
 
 func squareDistPoints(a Point, b Point) float64 {

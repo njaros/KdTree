@@ -1,5 +1,7 @@
 package point
 
+import "fmt"
+
 type Point struct {
 	position []float64
 	content  interface{}
@@ -30,4 +32,16 @@ func (p Point) Axis(i int) float64 {
 
 func (p Point) Content() interface{} {
 	return p.content
+}
+
+func (p *Point) String() string {
+	str := "(";
+	for i, f := range p.position {
+		str += fmt.Sprint(f)
+		if i < p.Dimension() - 1 {
+			str += ", "
+		}
+	}
+	str += ")"
+	return str
 }

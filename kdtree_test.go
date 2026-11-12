@@ -110,8 +110,8 @@ func TestNearest(t *testing.T) {
 
 	for i := range 5 {
 		found := tree.Nearest(testPoints[i])
-		if !reflect.DeepEqual(*found, expected[i]) {
-			t.Errorf("%d: with testPoint %v -> expected '%v', found '%v'", i, testPoints[i], expected[i], *found)
+		if !reflect.DeepEqual(found, expected[i]) {
+			t.Errorf("%d: with testPoint %v -> expected '%v', found '%v'", i, testPoints[i], expected[i], found)
 		}
 	}
 }
@@ -136,8 +136,83 @@ func TestNearestUnsorted(t *testing.T) {
 
 	for i := range 5 {
 		found := tree.Nearest(testPoints[i])
-		if !reflect.DeepEqual(*found, expected[i]) {
-			t.Errorf("%d: with testPoint %v -> expected '%v', found '%v'", i, testPoints[i], expected[i], *found)
+		if !reflect.DeepEqual(found, expected[i]) {
+			t.Errorf("%d: with testPoint %v -> expected '%v', found '%v'", i, testPoints[i], expected[i], found)
+		}
+	}
+}
+
+func TestGetRange(t *testing.T) {
+	tree := getKdTreeInstance();
+	pointTests := []Point{
+		point.NewPoint2D(0, 0, nil),
+		point.NewPoint2D(10, -15, nil),
+		point.NewPoint2D(100, 100, nil),
+	}
+	radiusTests := []float64{0, 5, 10, 100}
+	expected := [][][]Point{
+		{
+			{},
+			{
+				point.NewPoint2D(1.2, 3.1, nil),
+				point.NewPoint2D(1, 1, nil),
+				point.NewPoint2D(-1.2, -3.1, nil),
+			},
+			{
+				point.NewPoint2D(1.2, 3.1, nil),
+				point.NewPoint2D(1, 1, nil),
+				point.NewPoint2D(-1.2, -3.1, nil),
+				point.NewPoint2D(1.1, 8.1, nil),
+				point.NewPoint2D(5.2, 4, nil),
+			},
+			{
+				point.NewPoint2D(1.21, 13.1, nil),
+				point.NewPoint2D(1.2, 3.1, nil),
+				point.NewPoint2D(1, 1, nil),
+				point.NewPoint2D(-1.2, -3.1, nil),
+				point.NewPoint2D(1.1, 8.1, nil),
+				point.NewPoint2D(0.2, 31.1, nil),
+				point.NewPoint2D(5.2, 4, nil),
+				point.NewPoint2D(17.2, -13.1, nil),
+				point.NewPoint2D(7, -8.1, nil),
+				point.NewPoint2D(11.2, 43.1, nil),
+				point.NewPoint2D(8, 8, nil),
+			},
+		},
+		{
+			{},
+			{},
+			{
+				point.NewPoint2D(17.2, -13.1, nil),
+				point.NewPoint2D(7, -8.1, nil),
+			},
+			{
+				point.NewPoint2D(1.21, 13.1, nil),
+				point.NewPoint2D(1.2, 3.1, nil),
+				point.NewPoint2D(1, 1, nil),
+				point.NewPoint2D(-1.2, -3.1, nil),
+				point.NewPoint2D(1.1, 8.1, nil),
+				point.NewPoint2D(0.2, 31.1, nil),
+				point.NewPoint2D(5.2, 4, nil),
+				point.NewPoint2D(17.2, -13.1, nil),
+				point.NewPoint2D(7, -8.1, nil),
+				point.NewPoint2D(11.2, 43.1, nil),
+				point.NewPoint2D(8, 8, nil),
+			},
+		},
+		{
+			{},
+			{},
+			{},
+			{},
+		},
+	}
+	for i, p := range(pointTests) {
+		for j, r := range(radiusTests) {
+			result := tree.GetAllInRange(p, r)
+			if !reflect.DeepEqual(result, expected[i][j]) {
+				t.Errorf("point: %v, range %f, expected %v, found %v", p, r, expected[i][j], result)
+			}
 		}
 	}
 }
